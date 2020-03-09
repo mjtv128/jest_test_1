@@ -23,6 +23,7 @@ const mock = [{
 ];
 
 describe('Users API test suite', () => {
+    jest.setTimeout(10000)
     it('should get all users', async() => {
         const response = await request.get('/users')
 
@@ -52,8 +53,71 @@ describe('Users API test suite', () => {
 
         expect(response.statusCode).toBe(201);
         expect(response.body.length).toBe(countBefore + 1)
+    })
 
+    it('should update a single user by id', async() => {
+        const response = await request.patch("/users/1").send({
+            department: 'design'
+        })
 
+        expect(response.statusCode).toBe(200)
+            // expect(response.body.user.department).toEqual('design')
+
+    });
+
+    it('should delete a single user by id', async() => {
+        const response = await request.delete('/users/1')
+
+        expect(response.statusCode).toBe(200)
+
+        response.body.users.forEach(user => {
+            if (user.name === "jane smith") {
+                throw new Error("user was not delete successfully")
+            }
+        })
+    })
+
+    it("should delete a single user by id", async() => {
+        const response = await request.delete("/users/1");
+
+        expect(response.statusCode).toBe(200);
+
+        response.body.users.forEach(user => {
+            if (user.name === "jane smith") {
+                throw new Error("user was not delete successfully");
+            }
+        });
+    });
+
+    it("should return 404 getting user", async() => {
+        const response = await request.get("/users/x");
+
+        expect(response.statusCode).toBe(404);
 
     })
+
+    it("should return 404 updating user", async() => {
+        const response = await request.patch("/users/x").send({
+            department: 'design'
+        });
+
+        expect(response.statusCode).toBe(404);
+    });
+
+    it("should return 404 creating user", async() => {
+        const response = await request.post("/users").send({
+            abcd: 'blah'
+        });
+
+        expect(response.statusCode).toBe(400);
+    });
+
+    it("should return 404 deleting user", async() => {
+        const response = await request.delete("/users/x");
+
+        expect(response.statusCode).toBe(404);
+    });
+
+
+
 })
